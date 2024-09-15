@@ -1,0 +1,7 @@
+{ 
+"release_types" : ["WEB-DL", "WEBRip", "DVD", "DVDRip", "BluRay", "BRrip", "BDRip", "BD", "HDTV", "TVRip"],
+"platforms" : ["AMZN", "NF", "StarzPlay", "SHOFHA", "SHAHID", "CR", "SGO", "AWAAN", "51KW", "WEYYAK", "VIU", "Arabeo", "Roya", "Aloula", "Mahatat", "HilalPlay", "Istikana", "Tabii", "TOOG", "ORBIT", "STCTV", "WATCHIT", "DSNP", "1001TV", "OSN", "BluTV", "TWIST", "DzairPlay", "NoorPlay", "Maraya", "VIKI", "HiTV", "MTV", "IQIYI", "WETV", "FORJA", "WK", "FASELPLUS", "SHASHA", "ADTV", "TenTime", "ElShasha", "TOD", "Almanasa", "Zolal", "MySatGo", "SwitchTV", "WK"],
+"additional_types" : ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MULTiSUB", "Arabic", "Subs", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "MULTI", "SUB", "SUBS", "DUB", "DUBS"],
+"codec_types" : ["x264", "x265", "XviD", "DivX", "AVC"],
+"audio_formats" : ["AAC", "AC3", "DTS", "FLAC", "MP3", "EAC3", "Opus"]
+}
