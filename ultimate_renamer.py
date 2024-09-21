@@ -4,7 +4,7 @@ import subprocess
 import json
 from pathlib import Path
 import requests
-
+import time
 
 # allowed_types = requests.get("https://raw.githubusercontent.com/kx2000xx/media_renamer/main/allowed_types").json()
 # current_year = datetime.datetime.now()
@@ -18,7 +18,7 @@ import requests
 
 release_types = ["WEB-DL", "WEBRip", "DVD", "DVDRip", "BluRay", "Bluray", "Blu-Ray","BRrip", "BDRip", "BD", "HDTV", "TVRip"]
 platforms = ["AMZN", "NF", "StarzPlay", "SHOFHA", "SHAHID", "CR", "SGO", "AWAAN", "51KW", "WEYYAK", "VIU", "Arabeo", "Roya", "Aloula", "Mahatat", "HilalPlay", "Istikana", "Tabii", "TOOG", "ORBIT", "STCTV", "WATCHIT", "DSNP", "1001TV", "OSN", "BluTV", "TWIST", "DzairPlay", "NoorPlay", "Maraya", "VIKI", "HiTV", "MTV", "IQIYI", "WETV", "FORJA", "WK", "FASELPLUS", "SHASHA", "ADTV", "TenTime", "ElShasha", "TOD", "Almanasa", "Zolal", "MySatGo", "SwitchTV", "WK"]
-additional_types = ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MULTiSUB", "Arabic", "Subs", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "MULTI", "SUB", "SUBS", "DUB", "DUBS", "3D"]
+additional_types = ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MultiSub", "Arabic", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "Multi", "Sub", "Subs", "Dub", "DubS", "3D"]
 codec_types = ["x264", "x265", "XviD", "DivX", "AVC"]
 audio_formats = ["AAC", "AC3", "DTS", "FLAC", "MP3", "EAC3", "Opus", "DD"]
 filebot = "FileBot/filebot.exe"
@@ -146,12 +146,18 @@ def renamer():
   files = os.listdir("files")
   extensions = [os.path.splitext(file)[1] for file in files]
   files_without_extensions = [os.path.splitext(file)[0] for file in files]
-  group = GROUP
+  #group = GROUP
   release_type = ""
   tvdb_id = None
   tmdb_id = None
   platform = ""
   for file, ext in zip(files_without_extensions, extensions):
+      grouptxt = os.listdir("files/"+file)
+      group = None
+      for g in grouptxt:
+          if g.endswith('.txt'):
+              group = g.split('.txt')[0]
+              break
       name = file.split(" ")
       print(name)
       additional_type = []
@@ -186,7 +192,7 @@ def renamer():
         platform = None
 
       
-      newformat = newformat + f".{release_type}."+ "{vc}.{bitdepth}bit.{ac}.{channels}{ (audioLanguages.name.size() > 1) ? '.MULTI.DUB' : (audioLanguages.name[0] =~ languages[0].name) ? '' : '.' + audioLanguages.name[0] + '.Dub'}"
+      newformat = newformat + f".{release_type}."+ "{vc}.{bitdepth}bit.{ac}.{channels}"
       if additional_type:
         for a in additional_type:
           newformat = newformat + f".{a}"
@@ -317,9 +323,24 @@ def post_arabnzb():
 
 
 
-
-renamer()
-input("Check Names Manually then Press Enter to continue....")
-export()
-run_ngpost()
-post_arabnzb()
+print("================Start Point====================")
+print("1) Renamer")
+print("2) export xml & nfo files")
+print("3) start ngpost")
+print("4) Post to arabnzb")
+choice = input("\n\n>>>>")
+if choice == '1':
+    renamer()
+    input("Check Names Manually then Press Enter to continue....")
+    export()
+    run_ngpost()
+    post_arabnzb()
+elif choice == '2':
+    export()
+    run_ngpost()
+    post_arabnzb()
+elif choice == '3':
+    run_ngpost()
+    post_arabnzb()
+elif choice == '4':
+    post_arabnzb()
