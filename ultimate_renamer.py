@@ -17,8 +17,8 @@ import time
 
 
 release_types = ["WEB-DL", "WEBRip", "DVD", "DVDRip", "BluRay", "Bluray", "Blu-Ray","BRrip", "BDRip", "BD", "HDTV", "TVRip"]
-platforms = ["AMZN", "NF", "StarzPlay", "SHOFHA", "SHAHID", "CR", "SGO", "AWAAN", "51KW", "WEYYAK", "VIU", "Arabeo", "Roya", "Aloula", "Mahatat", "HilalPlay", "Istikana", "Tabii", "TOOG", "ORBIT", "STCTV", "WATCHIT", "DSNP", "1001TV", "OSN", "BluTV", "TWIST", "DzairPlay", "NoorPlay", "Maraya", "VIKI", "HiTV", "MTV", "IQIYI", "WETV", "FORJA", "WK", "FASELPLUS", "SHASHA", "ADTV", "TenTime", "ElShasha", "TOD", "Almanasa", "Zolal", "MySatGo", "SwitchTV", "WK"]
-additional_types = ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MultiSub", "Arabic", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "Multi", "Sub", "Subs", "Dub", "DubS", "3D"]
+platforms = ["AMZN", "NF", "StarzPlay", "SP", "SHOFHA", "SHAHID", "CR", "SGO", "AWAAN", "51KW", "WEYYAK", "VIU", "Arabeo", "Roya", "Aloula", "Mahatat", "HilalPlay", "Istikana", "Tabii", "TOOG", "ORBIT", "STCTV", "WATCHIT", "DSNP", "1001TV", "OSN", "BluTV", "TWIST", "DzairPlay", "NoorPlay", "Maraya", "VIKI", "HiTV", "MTV", "IQIYI", "WETV", "FORJA", "WK", "FASELPLUS", "SHASHA", "ADTV", "TenTime", "ElShasha", "TOD", "Almanasa", "Zolal", "MySatGo", "SwitchTV", "WK", "AJ360"]
+additional_types = ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MultiSub", "Arabic", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "Multi", "Sub", "Subs", "Dub", "Dubs", "3D"]
 codec_types = ["x264", "x265", "XviD", "DivX", "AVC"]
 audio_formats = ["AAC", "AC3", "DTS", "FLAC", "MP3", "EAC3", "Opus", "DD"]
 filebot = "FileBot/filebot.exe"
@@ -27,7 +27,7 @@ mediainfo = "MediaInfo/MediaInfo.exe"
 with open('config.json') as config_file:
     config_data = json.load(config_file)
 API_KEY = config_data['API_KEY']
-GROUP = config_data['group']
+#GROUP = config_data['group']
 
 def execute_tvdb(file, ext, tvdb_id, newformat):
   subprocess.call([
@@ -54,13 +54,13 @@ def export_xml(root, file, newpath):
     
     subprocess.call([
         mediainfo, "--Output=XML", f"--LogFile={newpath}{file}.xml", f"{root}/{file}"
-    ])
+    ], stdout=subprocess.DEVNULL)
 
 
 def create_nfo(root, file, newpath):
     subprocess.call([
         mediainfo, "--BOM", f"--LogFile={newpath}{file}.nfo", f"{root}/{file}"
-    ])
+    ], stdout=subprocess.DEVNULL)
 
 
 
@@ -287,7 +287,8 @@ def run_ngpost():
 
 
 def post_arabnzb():
-   url = f"http://149.56.108.243/api?t=nzbadd&apikey={config_data['API_KEY']}"
+   url = f"https://arabnzb.co/api?t=nzbadd&apikey={config_data['API_KEY']}"
+   #url = f"http://149.56.108.243/api?t=nzbadd&apikey={config_data['API_KEY']}"
 
    # Path to the main directory
    folder_path = "nzb"
