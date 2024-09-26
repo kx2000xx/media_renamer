@@ -4,7 +4,6 @@ import subprocess
 import json
 from pathlib import Path
 import requests
-import time
 
 # allowed_types = requests.get("https://raw.githubusercontent.com/kx2000xx/media_renamer/main/allowed_types").json()
 # current_year = datetime.datetime.now()
@@ -20,7 +19,7 @@ release_types = ["WEB-DL", "WEBRip", "DVD", "DVDRip", "BluRay", "Bluray", "Blu-R
 platforms = ["AMZN", "NF", "StarzPlay", "SP", "SHOFHA", "SHAHID", "CR", "SGO", "AWAAN", "51KW", "WEYYAK", "VIU", "Arabeo", "Roya", "Aloula", "Mahatat", "HilalPlay", "Istikana", "Tabii", "TOOG", "ORBIT", "STCTV", "WATCHIT", "DSNP", "1001TV", "OSN", "BluTV", "TWIST", "DzairPlay", "NoorPlay", "Maraya", "VIKI", "HiTV", "MTV", "IQIYI", "WETV", "FORJA", "WK", "FASELPLUS", "SHASHA", "ADTV", "TenTime", "ElShasha", "TOD", "Almanasa", "Zolal", "MySatGo", "SwitchTV", "WK", "AJ360"]
 additional_types = ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MultiSub", "Arabic", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "Multi", "Sub", "Subs", "Dub", "Dubs", "3D"]
 codec_types = ["x264", "x265", "XviD", "DivX", "AVC"]
-audio_formats = ["AAC", "AC3", "DTS", "FLAC", "MP3", "EAC3", "Opus", "DD"]
+audio_formats = ["AAC", "AC3", "DTS", "FLAC", "MP3", "EAC3", "EAC", "Opus", "DD", "DDP"]
 filebot = "FileBot/filebot.exe"
 mediainfo = "MediaInfo/MediaInfo.exe"
 
@@ -55,6 +54,13 @@ def export_xml(root, file, newpath):
     subprocess.call([
         mediainfo, "--Output=XML", f"--LogFile={newpath}{file}.xml", f"{root}/{file}"
     ], stdout=subprocess.DEVNULL)
+    xmlfile = open(f"{newpath}{file}.xml", 'r')
+    if "FileExtension_Invalid" in xmlfile.read():
+            print(f"{file} extension is invalid!!")
+            xmlfile.close()
+            os.remove(f"{newpath}{file}.xml")
+            exit(1)
+        
 
 
 def create_nfo(root, file, newpath):
@@ -128,8 +134,9 @@ def export():
             if not os.path.exists(newpath):
                 os.makedirs(newpath)
 
-            create_nfo(root, file, newpath)
             export_xml(root, file, newpath)
+            create_nfo(root, file, newpath)
+            
         except:
             movie_name, year, resolution, release_type, platform, codec_type, bit, audio_format, group, additional_info = name_check(file)
             newpath = "nzb/"
@@ -138,8 +145,9 @@ def export():
             if not os.path.exists(newpath):
                 os.makedirs(newpath)
 
-            create_nfo(root, file, newpath)
             export_xml(root, file, newpath)
+            create_nfo(root, file, newpath)
+            
 
 
 def renamer():
