@@ -6,5 +6,6 @@
     "usenet_port": "563",
     "usenet_username": "",
     "usenet_password": "",
-    "usenet_connections": "20"
+    "usenet_connections": "20",
+    "usenet_upload_threads": "12"
 }
