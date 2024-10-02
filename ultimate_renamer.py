@@ -313,7 +313,7 @@ def run_ngpost():
                     '-l', 'en',
                     '-g', 'alt.binaries.misc',
                     '--gen_from',
-                    '--thread', '12',
+                    '--thread', f"{config_data["usenet_upload_threads"]}",
                     '--disp_progress', 'BAR',
                     '--tmp_dir', 'temp',
                     '--rar_max', '99',
