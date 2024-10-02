@@ -4,28 +4,31 @@ import subprocess
 import json
 from pathlib import Path
 import requests
+import xmltodict
 
-# allowed_types = requests.get("https://raw.githubusercontent.com/kx2000xx/media_renamer/main/allowed_types").json()
-# current_year = datetime.datetime.now()
-# release_types = allowed_types['release_types']
-# platforms = allowed_types['platforms']
-# additional_types = allowed_types['additional_types']
-# codec_types = allowed_types['codec_types']
-# audio_formats = allowed_types['audio_formats']
+allowed_types = requests.get("https://raw.githubusercontent.com/kx2000xx/media_renamer/main/allowed_types").json()
+release_types = allowed_types['release_types']
+platforms = allowed_types['platforms']
+additional_types = allowed_types['additional_types']
+codec_types = allowed_types['codec_types']
+audio_formats = allowed_types['audio_formats']
 
 
 
-release_types = ["WEB-DL", "WEBRip", "DVD", "DVDRip", "BluRay", "Bluray", "Blu-Ray","BRrip", "BDRip", "BD", "HDTV", "TVRip"]
-platforms = ["AMZN", "NF", "StarzPlay", "SP", "SHOFHA", "SHAHID", "CR", "SGO", "AWAAN", "51KW", "WEYYAK", "VIU", "Arabeo", "Roya", "Aloula", "Mahatat", "HilalPlay", "Istikana", "Tabii", "TOOG", "ORBIT", "STCTV", "WATCHIT", "DSNP", "1001TV", "OSN", "BluTV", "TWIST", "DzairPlay", "NoorPlay", "Maraya", "VIKI", "HiTV", "MTV", "IQIYI", "WETV", "FORJA", "WK", "FASELPLUS", "SHASHA", "ADTV", "TenTime", "ElShasha", "TOD", "Almanasa", "Zolal", "MySatGo", "SwitchTV", "WK", "AJ360"]
-additional_types = ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MultiSub", "Arabic", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "Multi", "Sub", "Subs", "Dub", "Dubs", "3D"]
-codec_types = ["x264", "x265", "XviD", "DivX", "AVC"]
-audio_formats = ["AAC", "AC3", "DTS", "FLAC", "MP3", "EAC3", "EAC", "Opus", "DD", "DDP"]
+# release_types = ["WEB-DL", "WEBRip", "DVD", "DVDRip", "BluRay", "Bluray", "Blu-Ray","BRrip", "BDRip", "BD", "HDTV", "TVRip"]
+# platforms = ["AMZN", "NF", "StarzPlay", "SP", "SHOFHA", "SHAHID", "CR", "SGO", "AWAAN", "51KW", "WEYYAK", "VIU", "Arabeo", "Roya", "Aloula", "Mahatat", "HilalPlay", "Istikana", "Tabii", "TOOG", "ORBIT", "STCTV", "WATCHIT", "DSNP", "1001TV", "OSN", "BluTV", "TWIST", "DzairPlay", "NoorPlay", "Maraya", "VIKI", "HiTV", "MTV", "IQIYI", "WETV", "FORJA", "WK", "FASELPLUS", "SHASHA", "ADTV", "TenTime", "ElShasha", "TOD", "Almanasa", "Zolal", "MySatGo", "SwitchTV", "WK", "AJ360"]
+# additional_types = ["EXTENDED","REPACK", "PROPER", "RERIP", "COMPLETE","DUAL", "AUDIO", "Subbed", "DIRECTORS", "CUT", "DC", "DV", "DolbyVision", "HDR", "HDR10", "PLUS", "UNRATED", "LIMITED", "REMUX", "Season", "Pack", "MultiSub", "Arabic", "FanSub", "HardSub", "SoftSub", "REMASTERED", "Reducted", "Multi", "Sub", "Subs", "Dub", "Dubs", "3D", "Part", "One", "Two", "Three", "Four"]
+# codec_types = ["x264", "x265", "XviD", "DivX", "AVC"]
+# audio_formats = ["AAC", "AC3", "DTS", "FLAC", "MP3", "EAC3", "EAC", "Opus", "DD", "DDP"]
 filebot = "FileBot/filebot.exe"
 mediainfo = "MediaInfo/MediaInfo.exe"
 
 with open('config.json') as config_file:
     config_data = json.load(config_file)
-API_KEY = config_data['API_KEY']
+Indexer_API_KEY = config_data['Indexer_API_KEY']
+always_tags = config_data['always_tags']
+always_tags = '.'.join(always_tags)
+
 #GROUP = config_data['group']
 
 def execute_tvdb(file, ext, tvdb_id, newformat):
@@ -54,20 +57,37 @@ def export_xml(root, file, newpath):
     subprocess.call([
         mediainfo, "--Output=XML", f"--LogFile={newpath}{file}.xml", f"{root}/{file}"
     ], stdout=subprocess.DEVNULL)
-    xmlfile = open(f"{newpath}{file}.xml", 'r')
-    if "FileExtension_Invalid" in xmlfile.read():
-            print(f"{file} extension is invalid!!")
-            xmlfile.close()
-            os.remove(f"{newpath}{file}.xml")
-            exit(1)
+    with open(f"{newpath}{file}.xml", 'r+') as xmlfile:
+        rrd = xmlfile.read()
+        if "FileExtension_Invalid" in rrd:
+                print(f"{file} extension is invalid!!")
+                xmlfile.close()
+                os.remove(f"{newpath}{file}.xml")
+                exit(1)
+        xml_data = xmltodict.parse(rrd)
+        new_complete_Name = str(xml_data['MediaInfo']['media']['@ref']).split('/')[-1]
+        xml_data['MediaInfo']['media']['@ref'] = new_complete_Name
+        xml_data = xmltodict.unparse(xml_data, pretty=True)
+        xmlfile.seek(0)
+        xmlfile.write(xml_data)
+        xmlfile.truncate()
         
 
 
 def create_nfo(root, file, newpath):
     subprocess.call([
-        mediainfo, "--BOM", f"--LogFile={newpath}{file}.nfo", f"{root}/{file}"
+        mediainfo, f"--LogFile={newpath}{file}.nfo", f"{root}/{file}"
     ], stdout=subprocess.DEVNULL)
-
+    with open(f"{newpath}{file}.nfo", 'r+', encoding='utf8') as nfofile:
+        nfo_content = nfofile.readlines()
+        for i, line in enumerate(nfo_content):
+            if "Complete name" in line:
+                new_complete_name = line.split(':')[-1].strip().split('/')[-1]
+                nfo_content[i] = f"Complete name                            : {new_complete_name}\n"
+                break
+        nfofile.seek(0)
+        nfofile.writelines(nfo_content)
+        nfofile.truncate()
 
 
 def name_check(fullname):
@@ -201,6 +221,8 @@ def renamer():
 
       
       newformat = newformat + f".{release_type}."+ "{vc}.{bitdepth}bit.{ac}.{channels}"
+      if always_tags:
+          newformat = newformat + f".{always_tags}"
       if additional_type:
         for a in additional_type:
           newformat = newformat + f".{a}"
@@ -269,15 +291,41 @@ def run_ngpost():
                 if not nzb_file_path.parent.exists():
                     nzb_file_path.parent.mkdir(parents=True, exist_ok=True)
 
+                # COMMAND = [
+                #     f'{ngPost_exe}',
+                #     '-i',
+                #     f'{source_file_path}',
+                #     '-o',
+                #     f'{nzb_file_path}',
+                #     '-c',
+                #     f'{ngPost_conf}',
+                #     '--gen_par2',
+                #     '-x'
+                # ]
+
                 COMMAND = [
                     f'{ngPost_exe}',
                     '-i',
                     f'{source_file_path}',
                     '-o',
                     f'{nzb_file_path}',
-                    '-c',
-                    f'{ngPost_conf}',
+                    '-c', f"{ngPost_conf}",
+                    '-l', 'en',
+                    '-g', 'alt.binaries.misc',
+                    '--gen_from',
+                    '--thread', '12',
+                    '--disp_progress', 'BAR',
+                    '--tmp_dir', 'temp',
+                    '--rar_max', '99',
+                    '--par2_pct', '10',
+                    '--par2_path', 'ngPostv4.16.1_x64\\parpar.exe',
                     '--gen_par2',
+                    '--host', f"{config_data['usenet_host']}",
+                    '--port', f"{config_data['usenet_port']}",
+                    '--user', f"{config_data['usenet_username']}",
+                    '--pass', f"{config_data['usenet_password']}",
+                    '--connection', f"{config_data["usenet_connections"]}",
+                    '--ssl',
                     '-x'
                 ]
                 subprocess.run(COMMAND)
@@ -295,8 +343,7 @@ def run_ngpost():
 
 
 def post_arabnzb():
-   url = f"https://arabnzb.co/api?t=nzbadd&apikey={config_data['API_KEY']}"
-   #url = f"http://149.56.108.243/api?t=nzbadd&apikey={config_data['API_KEY']}"
+   url = f"https://arabnzb.co/api?t=nzbadd&apikey={config_data['Indexer_API_KEY']}"
 
    # Path to the main directory
    folder_path = "nzb"
@@ -315,9 +362,7 @@ def post_arabnzb():
    for nzb_file in nzb_files:
         files = {'file': open(f"{nzb_file}.nzb", 'rb'), 'nfo': open(f"{nzb_file}.nfo", 'rb'), 'mediainfo': open(f"{nzb_file}.xml", 'rb')}
         match = re.match(r'^(.*?)\.(\d{4}).(\d+p)', nzb_file)
-        if "3D" in nzb_file and match:
-            response = requests.post(url+"&cat=2060", files=files)
-        elif ("Blu-Ray" in nzb_file or "BluRay" in nzb_file or "Bluray" in nzb_file) and re.match(r'^(.*?)\.(\d{4}).(\d+p)', nzb_file) and match:
+        if ("Blu-Ray" in nzb_file or "BluRay" in nzb_file or "Bluray" in nzb_file or "BDRip" in nzb_file or "BRrip" in nzb_file or "BD" in nzb_file) and re.match(r'^(.*?)\.(\d{4}).(\d+p)', nzb_file) and match:
             response = requests.post(url+"&cat=2050", files=files)
         else:
             response = requests.post(url, files=files)
