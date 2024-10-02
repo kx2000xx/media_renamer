@@ -1,0 +1,10 @@
+{
+    "always_tags": ["Arabic", "Dub"],
+    "Indexer_API_KEY": "",
+    "Delete-After-Upload": false,
+    "usenet_host": "",
+    "usenet_port": "563",
+    "usenet_username": "",
+    "usenet_password": "",
+    "usenet_connections": "20"
+}
