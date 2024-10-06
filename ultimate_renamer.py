@@ -28,6 +28,13 @@ with open('config.json') as config_file:
 Indexer_API_KEY = config_data['Indexer_API_KEY']
 always_tags = config_data['always_tags']
 always_tags = '.'.join(always_tags)
+usenet_host = config_data['usenet_host']
+usenet_port = config_data['usenet_port']
+usenet_username = config_data['usenet_username']
+usenet_password = config_data['usenet_password']
+usenet_connections = config_data['usenet_connections']
+usenet_upload_threads = config_data['usenet_upload_threads']
+
 
 #GROUP = config_data['group']
 
@@ -313,18 +320,18 @@ def run_ngpost():
                     '-l', 'en',
                     '-g', 'alt.binaries.misc',
                     '--gen_from',
-                    '--thread', f"{config_data["usenet_upload_threads"]}",
+                    '--thread', usenet_upload_threads,
                     '--disp_progress', 'BAR',
                     '--tmp_dir', 'temp',
                     '--rar_max', '99',
                     '--par2_pct', '10',
                     '--par2_path', 'ngPostv4.16.1_x64\\parpar.exe',
                     '--gen_par2',
-                    '--host', f"{config_data['usenet_host']}",
-                    '--port', f"{config_data['usenet_port']}",
-                    '--user', f"{config_data['usenet_username']}",
-                    '--pass', f"{config_data['usenet_password']}",
-                    '--connection', f"{config_data["usenet_connections"]}",
+                    '--host', usenet_host,
+                    '--port', usenet_port,
+                    '--user', usenet_username,
+                    '--pass', usenet_password,
+                    '--connection', usenet_connections,
                     '--ssl',
                     '-x'
                 ]
@@ -343,7 +350,7 @@ def run_ngpost():
 
 
 def post_arabnzb():
-   url = f"https://arabnzb.co/api?t=nzbadd&apikey={config_data['Indexer_API_KEY']}"
+   url = f"https://arabnzb.co/api?t=nzbadd&apikey=" + Indexer_API_KEY
 
    # Path to the main directory
    folder_path = "nzb"
