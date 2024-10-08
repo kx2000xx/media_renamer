@@ -210,9 +210,9 @@ def renamer():
       
       
       if tvdb_id:
-          newformat = "{n.replace(' ', '.')}.{s00e00}.{vf}"
+          newformat = "{n.clean().validateFileName().ascii().upperInitial().space('.')}.{s00e00}.{vf}"
       elif tmdb_id:
-          newformat = "{n.replace(' ', '.')}.{y}.{vf}"
+          newformat = "{n.clean().validateFileName().ascii().upperInitial().space('.')}.{y}.{vf}"
 
 
       if release_type == "WEBRip" or release_type == "WEB-DL":
